@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.Normalizer;
@@ -17,10 +18,22 @@ import java.util.Random;
 import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
-    String[] states = {"Acre", "Alagoas", "Amapá", "Amazonas", "Bahia", "Ceará", "Espírito Santo", "Goiás", "Maranhão", "Mato Grosso", "Mato Grosso do Sul", "Paraíba", "Piauí", "Roraima", "Rondônia"};
-    String[] cities = {"Rio Branco", "Maceió", "Macapá", "Manaus", "Salvador", "Fortaleza", "Vitória", "Goiânia", "São Luís", "Cuiabá", "Campo Grande", "João Pessoa", "Teresina", "Boa Vista", "Porto Velho"};
+    String[] states = {"Barcelona", "Brasilia", "Curitiba", "Las Vegas", "Montreal", "Paris", "Rio de Janeiro", "Salvador", "São Paulo", "Tóquio"};
+    String[] urls = {
+        "http://200.236.3.202/Cidades/01_barcelona.jpg",
+        "http://200.236.3.202/Cidades/02_brasilia.jpg",
+        "http://200.236.3.202/Cidades/03_curitiba.jpg",
+        "http://200.236.3.202/Cidades/04_lasvegas.jpg",
+        "http://200.236.3.202/Cidades/05_montreal.jpg",
+        "http://200.236.3.202/Cidades/06_paris.jpg",
+        "http://200.236.3.202/Cidades/07_riodejaneiro.jpg",
+        "http://200.236.3.202/Cidades/08_salvador.jpg",
+        "http://200.236.3.202/Cidades/09_saopaulo.jpg",
+        "http://200.236.3.202/Cidades/10_toquio.jpg"
+    };
+    ImageView imageView;
     List<String> sorteadas = new ArrayList<String>();
-    TextView score, state, output;
+    TextView state, output;
     EditText input;
     Button guessBtn, nextBtn;
     Random random = new Random();
@@ -31,15 +44,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        score = findViewById(R.id.score);
         state = findViewById(R.id.state);
         output = findViewById(R.id.output);
-        input = findViewById(R.id.capital);
+        input = findViewById(R.id.input);
         guessBtn = findViewById(R.id.guessBtn);
         nextBtn = findViewById(R.id.nextBtn);
+        imageView = findViewById(R.id.imageView);
 
         draw(); //sorteia um estado inicial
-        score.setText("Pontuação: " + scoreInt + " pontos"); //seto o score inicial pra zero
 
         nextBtn.setEnabled(false);//desabilito o botao de proximo
 
@@ -53,15 +65,14 @@ public class MainActivity extends AppCompatActivity {
                 .replaceAll(""); //Retira todos os acentos
         res = res.toLowerCase(Locale.ROOT);
         String capitalSemAcento = Pattern.compile("\\p{InCombiningDiacriticalMarks}+")
-                .matcher(Normalizer.normalize(cities[actual].toLowerCase(Locale.ROOT), Normalizer.Form.NFD))
+                .matcher(Normalizer.normalize(states[actual].toLowerCase(Locale.ROOT), Normalizer.Form.NFD))
                 .replaceAll(""); //Retira todos os acentos
         String capital = capitalSemAcento.toLowerCase(Locale.ROOT);
         if(res.equals(capital)) {
             output.setText("Correto!");
-            scoreInt += 10; // aumento o score
-            score.setText("Pontuação: " + scoreInt + " pontos");
+            scoreInt += 25; // aumento o score
         } else
-            output.setText("Erro, resposta correta: " + cities[actual]);
+            output.setText("Erro, resposta correta: " + states[actual]);
 
         nextBtn.setEnabled(count < 5); // se for a quinta resposta ele termina o jogo e nao deixa dar next
         guessBtn.setEnabled(false);
@@ -78,9 +89,10 @@ public class MainActivity extends AppCompatActivity {
 
     private void draw() {
         do {
-            actual = random.nextInt(14);
+            actual = random.nextInt(10);
         } while (sorteadas.contains(states[actual]));
-        state.setText(states[actual]);
+        DownloadTask task = new DownloadTask(this, imageView);
+        task.execute(urls[actual]);
         sorteadas.add(states[actual]);
     }
 }
