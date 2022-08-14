@@ -2,6 +2,7 @@ package samuel.jose.cidadequiz;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -74,7 +75,9 @@ public class MainActivity extends AppCompatActivity {
         } else
             output.setText("Erro, resposta correta: " + states[actual]);
 
-        nextBtn.setEnabled(count < 5); // se for a quinta resposta ele termina o jogo e nao deixa dar next
+        nextBtn.setEnabled(true);
+        if(count == 4)
+            nextBtn.setText("Ver pontuação");
         guessBtn.setEnabled(false);
     }
 
@@ -85,6 +88,13 @@ public class MainActivity extends AppCompatActivity {
         nextBtn.setEnabled(false);
         guessBtn.setEnabled(true);
         count++;
+        if(count == 5) {
+            Intent it = new Intent(this, Pontuacao.class);
+            Bundle params = new Bundle();
+            params.putString("pontuacao", String.valueOf(scoreInt));
+            it.putExtras(params);
+            startActivity(it);
+        }
     }
 
     private void draw() {
